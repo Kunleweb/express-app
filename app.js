@@ -1,7 +1,16 @@
 const fs = require('fs')
 const tours = JSON.parse(fs.readFileSync('./tours-simple.json', 'utf-8'))
 const express = require('express')
+
+const morgan =  require('morgan')
 const app = express()
+
+
+if(process.env.NODE_ENV == 'development'){
+    app.use(morgan('dev'))
+}
+
+
 
 const tourrouter = require('./tourrouter')
 app.use(express.json())
