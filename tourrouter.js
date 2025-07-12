@@ -15,9 +15,9 @@ router.route('/')
 .get(tourController.getalltours)
 .post(tourController.createtour) 
 
-router.delete('/test-delete', (req, res) => {
-  res.status(200).json({ message: 'DELETE route works!' });
-});
+// router.delete('/test-delete', (req, res) => {
+//   res.status(200).json({ message: 'DELETE route works!' });
+// });
 
 
 
