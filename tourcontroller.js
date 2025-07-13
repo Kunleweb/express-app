@@ -6,35 +6,64 @@ const Tour = require('./models/tourmodels')
 
 exports.getalltours = async (req,res)=>{
 
-    // Basic Filtering
-    // const queryOBJ = {...req.url}
-    const query = Tour.find(queryOBJ).split(',').join(' ')
+    // Basic Filtering: Here we exclude params from the request query
+    const queryObj = {...req.query};
+    const excludedFields = ["page", "sort", "limit", "fields"];  
+    excludedFields.forEach((el) => delete queryObj[el]); 
+    // Basic Filtering: Here we filter params from the request query
+
+    
+    // Advanced filtering in other to add more keys to params
+    let queryStr = JSON.stringify(queryObj)
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)
+    let query = Tour.find(JSON.parse(queryStr))
 
 
-    // Advanced Filtering
-
-    // let querystr = JSON.stringify(req.query)
-    // querystr = querystr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)
-    // req.query = req.query.find(JSON.parse(querystr))
-
-
-     
-
+    // Sorting based on field ?sort=price
+    if (req.query.sort){
+        const sortby = req.query.sort.split(',').join(' ');
+        query= query.sort(sortby)
+    }else{
+        query =query.sort('-createdAt')
+    }
 
 
+    // Limiting: ?fields =  basically to decide which data is shown to us.
+    if(req.query.fields){
+        const fields = req.query.fields.split(',').join(' ');
+        query = query.select(fields)
+    }
+
+
+
+    // Pagination
+    // specify ?page and limit
+
+    if (req.query.page){
+        const page = req.query.page*1 || 1
+        const limit = req.query.limit*1 || 100
+        const skip = (page-1)*limit
+        query=query.skip(skip).limit(limit)
+
+
+    }
 
 
 
 
 
-    // Execute
+
+
+
     const tour = await query
+
+
+
+
+
+
     res.status(200).json({status:'success', results: tour.length, data:{tour}})
 }
-
-
-
-// do filter, sort, limit, pagination, 
 
 
 exports.gettours = async (req,res)=>{
