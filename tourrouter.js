@@ -11,6 +11,10 @@ const tourController = require('./tourcontroller')
 
 // router.param('id', tourController.checkID)
 
+
+router.route('/top-5-tour')
+.get(tourController.aliastoptours, tourController.getalltours)
+
 router.route('/')
 .get(tourController.getalltours)
 .post(tourController.createtour) 
