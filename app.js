@@ -13,10 +13,11 @@ if(process.env.NODE_ENV == 'development'){
 
 
 const tourrouter = require('./tourrouter')
-
+const userrouter = require('./userrouter')
 
 
 app.use('/api/v1/tours', tourrouter)
+app.use('/api/v1/users', userrouter)
 
 module.exports=app
 

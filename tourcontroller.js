@@ -1,4 +1,5 @@
 const Tour = require("./models/tourmodels");
+const APIfeatures = require('./utils/apiFeatures')
 
 exports.aliastoptours = (req, res, next) => {
   req.query.limit = "5";
@@ -6,100 +7,18 @@ exports.aliastoptours = (req, res, next) => {
   next();
 };
 
-// Refactoring our API features
 
-class APIfeatures{
-  constructor(query, queryString) {
-    this.query = query, 
-    this.queryString = queryString
-  }
 
-  filter() {
-    const queryObj = { ...this.queryString };
-    const excludedFields = ["page", "sort", "limit", "fields"];
-    excludedFields.forEach((el) => delete queryObj[el]);
-    // Basic Filtering: Here we filter params from the request query
 
-    // Advanced filtering in other to add more keys to params
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    this.query = this.query.find(JSON.parse(queryStr));
-    return this;
-  }
-
-  sort() {
-    if (this.queryString.sort) {
-      const sortby = this.queryString.sort.split(",").join(" ");
-      this.query = this.query.sort(sortby);
-    } else {
-      this.query = this.query.sort("-createdAt");
-    }
-
-    return this;
-  }
-
-  limit() {
-    if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(",").join(" ");
-      this.query = this.query.select(fields);
-    }
-    return this;
-  }
-
-  pagination() {
-   
-      const page = this.queryString.page * 1 || 1;
-      const limit = this.queryString.limit * 1 || 100;
-      const skip = (page - 1) * limit;
-      this.query = this.query.skip(skip).limit(limit);
-    
-    return this;
-  }
-}
 
 exports.getalltours = async (req, res) => {
-  // // Basic Filtering: Here we exclude params from the request query
-  // const queryObj = {...req.query};
-  // const excludedFields = ["page", "sort", "limit", "fields"];
-  // excludedFields.forEach((el) => delete queryObj[el]);
-  // // Basic Filtering: Here we filter params from the request query
-
-  // // Advanced filtering in other to add more keys to params
-  // let queryStr = JSON.stringify(queryObj)
-  // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)
-  // let query = Tour.find(JSON.parse(queryStr))
-
-  // // Sorting based on field ?sort=price
-  // if (req.query.sort){
-  //     const sortby = req.query.sort.split(',').join(' ');
-  //     query= query.sort(sortby)
-  // }else{
-  //     query =query.sort('-createdAt')
-  // }
-
-  // // Limiting: ?fields =  basically to decide which data is shown to us.
-  // if(req.query.fields){
-  //     const fields = req.query.fields.split(',').join(' ');
-  //     query = query.select(fields)
-  // }
-
-  // // Pagination
-  // // specify ?page and limit
-
-  // if (req.query.page){
-  //     const page = req.query.page*1 || 1
-  //     const limit = req.query.limit*1 || 100
-  //     const skip = (page-1)*limit
-  //     query=query.skip(skip).limit(limit)
-
-  // }
 
   const features = new APIfeatures(Tour.find(), req.query).filter().sort().limit().pagination();
   const tours = await features.query;
 
   res
     .status(200)
-    .json({ status: "success", results: tours.length, data: tours });
+    .json({status: "success", results:tours.length, data:tours});
 };
 
 exports.gettours = async (req, res) => {
