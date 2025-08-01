@@ -3,6 +3,16 @@ const bcrypt = require('bcrypt');
 const jwt = require ('jsonwebtoken');
 
 
+
+// we create a a sign token 
+// SO THIS USES THE ID/HEADER ASSIGNED BY MONGO WITH THE SECRET WE CREATED TO CREATE A SIGNATURE
+const signToken = id =>{
+    return jwt.sign({id}, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN
+    })
+}
+
+
 exports.createUser = async(req,res,next)=>{
     try{const user = await User.create({
         name: req.body.name,
@@ -26,11 +36,16 @@ exports.login = async(req, res, next) =>{
     if(!user||!await user.correctPassword(password, user.password))
         return next(res.status(401).json({status:'wrong details'}));
 
-    res.status(200).json({status:'logged in'})
+    
+
+    // Here we want to send token to client
+    const token = signToken(user._id)
+    res.status(200).json({status:'success', token})
 
 
 
-    // PRACTIVE JWT IMPLEMENTATION
+
+ 
 
 
 
