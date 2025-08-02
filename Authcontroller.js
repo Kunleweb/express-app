@@ -1,8 +1,9 @@
 const User = require('./models/userModel');
+const crypto = require('crypto')
 const bcrypt = require('bcrypt');
 const jwt = require ('jsonwebtoken');
 const {promisify} = require('util');
-const sendEmail = require('./email')
+const sendEmail = require('./email');
 
 
 
@@ -147,13 +148,26 @@ exports.forgotPassword = async(req, res, next)=>{
         subject: 'your password reset token',
         message
     })
-
-
     res.status(200).json({status: 'success', message: 'token sent to email'})
 
-
-
-
-
     }catch(err){res.status(500).json({status: 'you cooked my boy!', message:err.message})}
+}
+
+
+
+exports.resetPassword = async(req, res, next)=>{
+    try{
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+    const user = await User.findOne({passwordResetToken: hashedToken, passwordResetExpires:{$gt:Date.now()}})
+
+    if(!user){return next(res.status(400).json({status:'Token is invalid'}))}
+    user.password = req.body.password;
+    user.passwordConfirm= req.body.passwordConfirm;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    const token = signToken(user._id)
+    res.status(200).json({status:'success', token})}catch(err){res.status(400).json({
+        status:'failed', message:err.message
+    })}
 }
