@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 const validator = require('validator')
 const bcrypt = require('bcrypt');
-
+const crypto = require('crypto')
 
 const userSchema = new mongoose.Schema({
     'name': {required: true, type: String},
     'email': {required: true, validate:[validator.isEmail, 'Please provide correct email format'], type:String},
     'password': {required:true, type: String, maxlength: 100, minlength: 10},
+    'passwordChangedAt':Date,
+    'roles': {type: String, enum:['user', 'admin'], default:'user'},
 
     'passwordConfirm': {required:true, type: String, maxlength: 100, minlength: 10,
         validate: {validator: function(el){return el === this.password}, 
@@ -30,8 +32,14 @@ userSchema.methods.correctPassword =async function(candidatePassword, userPasswo
     return await bcrypt.compare(candidatePassword, userPassword)
 }
 
+userSchema.methods.changedPassword = function(JWTTimestamp){
+    if(this.passwordChangedAt){
+        const changedTimestamp = parseInt(
+            this.passwordChangedAt.getTime()/1000, 10);
+        return JWTTimestamp < changedTimestamp;}
 
-
+        return false;            
+}
 
 
 
