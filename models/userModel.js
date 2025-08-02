@@ -13,7 +13,9 @@ const userSchema = new mongoose.Schema({
     'passwordConfirm': {required:true, type: String, maxlength: 100, minlength: 10,
         validate: {validator: function(el){return el === this.password}, 
         message: 'password and password confirm do not match'}
-    }
+    },
+    'passwordResetToken': String,
+    'passwordResetExpires': Date,
 })
 
 // We want to create a document middleware for hashing our passwords;
@@ -44,9 +46,45 @@ userSchema.methods.changedPassword = function(JWTTimestamp){
 
 
 
+// Here we are basically creating our own token
+userSchema.methods.createPasswordResetToken = function() {
+    
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+
+//   This encrypts the rest token in the database where this represents Useschema
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  
+  console.log({resetToken} , this.passwordResetToken);
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
 
 
 
+
+// userSchema.methods.createPasswordResetToken = function(){
+//     const resetToken = crypto.randomBytes(32).toString('hex')
+
+//     // we then encrypt the reset token and set it in our db
+//     this.passwordResetToken = crypto.hash('sha256').update(resetToken).digest('hex');
+
+
+//      console.log({resetToken} , this.passwordResetToken);
+//     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+//     return resetToken;
+
+
+
+
+// }
 
 
 

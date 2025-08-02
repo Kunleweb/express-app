@@ -5,7 +5,7 @@ const Authcontroller = require('./Authcontroller.js');
 
 router.post('/createUser', Authcontroller.createUser);
 router.post('/login', Authcontroller.login);
-
+router.post('/forgotPassword', Authcontroller.forgotPassword)
 
 
 

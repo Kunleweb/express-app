@@ -2,6 +2,7 @@ const User = require('./models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require ('jsonwebtoken');
 const {promisify} = require('util');
+const sendEmail = require('./email')
 
 
 
@@ -112,4 +113,47 @@ exports.restrictTo = (...roles)=>{
         next()
 
     }
+}
+
+
+
+exports.forgotPassword = async(req, res, next)=>{
+    try{
+    // We obtain the posted detail
+    const user = await User.findOne({email: req.body.email});
+    if(!user){
+        return next(res.status(404).json({status: 'No user with this email address'}))
+    }
+
+    // if there is we would need to generate a reset token for password reset
+
+    const resetToken = user.createPasswordResetToken();
+    // // We use this and set to false becasue in the reset token function in our model
+    // // we are creating two objects in our schema and since we have required
+    // // objects we set the validation to false so that it doesnt run and saves it to the current
+    // // user or use r wit the findone enmail 
+    await user.save({validateBeforeSave:false})
+
+
+    // // We now need to send token to user email, this reseturl in message will be sent to email
+    const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/${resetToken}`
+    const message = `Forgot Password? Click to reset ${resetURL}`  
+
+
+    // // we no send the message
+
+    await sendEmail({
+        email:user.email,
+        subject: 'your password reset token',
+        message
+    })
+
+
+    res.status(200).json({status: 'success', message: 'token sent to email'})
+
+
+
+
+
+    }catch(err){res.status(500).json({status: 'you cooked my boy!', message:err.message})}
 }
