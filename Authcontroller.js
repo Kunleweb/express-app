@@ -171,3 +171,5 @@ exports.resetPassword = async(req, res, next)=>{
         status:'failed', message:err.message
     })}
 }
+
+/
