@@ -70,11 +70,9 @@ exports.protect = async (req, res, next)=>{
         req.headers.authorization.startsWith('Bearer')){
             token = req.headers.authorization.split(' ')[1]
         }
-
         if (!token){
            return next(res.status(401).json({status: 'failed', message: 'unauthorized'})) 
         }
-
         // Verify Token; 
         // understand that the token is generated from when a user logins and this stores the user id
         const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
@@ -96,7 +94,7 @@ exports.protect = async (req, res, next)=>{
 
 
         req.user = currentUSER;
-        next();}catch(err){res.status(500).json({status:'fail', message: 'something happened'})}
+        next();}catch(err){res.status(500).json({status:'fail', message: err.message})}
 
 
     
@@ -170,6 +168,9 @@ exports.resetPassword = async(req, res, next)=>{
     res.status(200).json({status:'success', token})}catch(err){res.status(400).json({
         status:'failed', message:err.message
     })}
-}
+} 
 
-/
+
+exports.getUser = async(req, res, next)=>{
+       const users = await User.find();
+       res.status(200).json({status: 'success', data: {users}})}

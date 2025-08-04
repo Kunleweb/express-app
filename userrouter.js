@@ -8,6 +8,8 @@ router.post('/login', Authcontroller.login);
 router.post('/forgotPassword', Authcontroller.forgotPassword)
 router.patch('/resetPassword/:token', Authcontroller.resetPassword)
 
+router.get('/', Authcontroller.getUser);
+
 
 
 module.exports = router

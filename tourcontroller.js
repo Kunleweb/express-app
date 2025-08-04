@@ -26,14 +26,20 @@ exports.gettours = async (req, res) => {
   res.status(200).json({ status: "sucess", data: { tour } });
 };
 
-exports.createtour = (req, res) => {
-  const new_ID = tours[tours.length - 1].id + 1;
-  const new_tour = Object.assign({ id: new_ID }, req.body);
-  tours.push(new_tour);
-  fs.writeFile(`./tours-simple.json`, JSON.stringify(tours), (err) => {
-    res.status(201).json({ status: "success", data: { tours: new_tour } });
-  });
-};
+// exports.createtour = (req, res) => {
+//   const new_ID = tours[tours.length - 1].id + 1;
+//   const new_tour = Object.assign({ id: new_ID }, req.body);
+//   tours.push(new_tour);
+//   fs.writeFile(`./tours-simple.json`, JSON.stringify(tours), (err) => {
+//     res.status(201).json({ status: "success", data: { tours: new_tour } });
+//   });
+// };
+
+
+exports.createtour = async (req, res, next) =>{
+            const tours = await Tour.Create(req.body);
+            res.status(200).json({status:'everywhere good', data: {tours}})}
+
 
 exports.deletetour = async (req, res) => {
   try {

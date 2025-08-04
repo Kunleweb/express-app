@@ -1,9 +1,12 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-dotenv.config({ path: './../config.env' });
+dotenv.config({ path: `${__dirname}/config.env` });
 
 const Tour = require('./../models/tourmodels');
+const tours = JSON.parse(
+  fs.readFileSync(`${__dirname}/tours.json`, 'utf-8')
+);
 
 
 const DB = process.env.DATABASE.replace('<db_password>', process.env.DATABASE_PASSWORD);
@@ -12,10 +15,6 @@ mongoose.connect(DB, {useNewUrlParser: true,  useCreateIndex: true, useFindAndMo
     }
 ) 
 
-
-const tours = JSON.parse(
-  fs.readFileSync('./../tours-simple.json', 'utf-8')
-);
 
 
 

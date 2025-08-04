@@ -1,5 +1,5 @@
 const fs = require('fs')
-const tours = JSON.parse(fs.readFileSync('./tours-simple.json', 'utf-8'))
+// const tours = JSON.parse(fs.readFileSync('./tours-simple.json', 'utf-8'))
 const express = require('express')
 
 const morgan =  require('morgan')

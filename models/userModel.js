@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema({
     'password': {required:true, type: String, maxlength: 100, minlength: 10},
     'passwordChangedAt':Date,
     'roles': {type: String, enum:['user', 'admin'], default:'user'},
-
     'passwordConfirm': {required:true, type: String, maxlength: 100, minlength: 10,
         validate: {validator: function(el){return el === this.password}, 
         message: 'password and password confirm do not match'}
